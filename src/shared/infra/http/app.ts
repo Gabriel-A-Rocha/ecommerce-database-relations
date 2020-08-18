@@ -8,6 +8,7 @@ import AppError from '@shared/errors/AppError';
 import createConnection from '@shared/infra/typeorm';
 import routes from './routes';
 
+// dependency injections
 import '@shared/container';
 
 createConnection();

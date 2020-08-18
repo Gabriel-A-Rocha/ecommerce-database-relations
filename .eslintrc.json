@@ -22,11 +22,13 @@
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
     "@typescript-eslint/no-unused-vars": [
-      "error",
+      "off",
       {
         "argsIgnorePattern": "_"
       }
     ],
+    "no-console": "off",
+    "no-unused-vars": "off",
     "no-useless-constructor": "off",
     "@typescript-eslint/interface-name-prefix": [
       "error",
