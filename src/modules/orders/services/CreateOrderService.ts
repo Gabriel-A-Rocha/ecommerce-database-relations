@@ -38,27 +38,15 @@ class CreateOrderService {
       throw new AppError('This customer ID does not exist.', 400);
     }
 
-    // retrieve desired products from the database
-    const productsIDs = products.map(item => {
-      return {
-        id: item.id,
-      };
-    });
+    /*    interface IProduct {
+      product_id: string;
+      price: number;
+      quantity: number;
+    } */
 
-    const stockProducts = await this.productsRepository.findAllById(
-      productsIDs,
-    );
-
-    const formattedProducts = products.map(item => {
-      return {
-        ...item,
-        quantity: 1,
-      };
-    });
-
-    const orderCreated = await this.ordersRepository.create({
+    const order = this.ordersRepository.create({
       customer,
-      formattedProducts,
+      products,
     });
   }
 }

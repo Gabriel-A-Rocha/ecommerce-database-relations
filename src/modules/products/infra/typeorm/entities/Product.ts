@@ -18,15 +18,15 @@ class Product {
   @Column()
   name: string;
 
-  @Column()
+  @Column('decimal')
   price: number;
 
-  @Column()
+  @Column('int')
   quantity: number;
 
   // Both "() => TargetEntity" or "type => TargetEntity" works
   // the product's primary key will be referenced in many entries from the orders_products table
-  @JoinColumn({ name: 'order_products' })
+  // @JoinColumn({ name: 'order_products' })
   @OneToMany(() => OrdersProducts, order_product => order_product.product)
   order_products: OrdersProducts[];
 
