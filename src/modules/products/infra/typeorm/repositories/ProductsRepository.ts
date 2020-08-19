@@ -34,7 +34,7 @@ class ProductsRepository implements IProductsRepository {
   }
 
   public async findByName(name: string): Promise<Product | undefined> {
-    const product = this.ormRepository.findOne({
+    const product = await this.ormRepository.findOne({
       name,
     });
 
@@ -42,7 +42,7 @@ class ProductsRepository implements IProductsRepository {
   }
 
   public async findAllById(products: IFindProducts[]): Promise<Product[]> {
-    const stockProducts = this.ormRepository.findByIds(products);
+    const stockProducts = await this.ormRepository.findByIds(products);
 
     return stockProducts;
   }
@@ -50,7 +50,30 @@ class ProductsRepository implements IProductsRepository {
   public async updateQuantity(
     products: IUpdateProductsQuantityDTO[],
   ): Promise<Product[]> {
-    // TODO
+    const idsToUpdate = products.map(item => item.id);
+
+    const stockProducts = await this.ormRepository.findByIds(idsToUpdate);
+
+    if (!stockProducts) {
+      throw new AppError('Error during stock quantity update.');
+    }
+
+    const updatedStockProducts = stockProducts.map(stockProduct => {
+      const productFromRequest = products.find(
+        item => item.id === stockProduct.id,
+      );
+
+      if (!productFromRequest) {
+        throw new AppError('Error during stock quantity update.');
+      }
+
+      return {
+        ...stockProduct,
+        quantity: stockProduct.quantity - productFromRequest.quantity,
+      };
+    });
+
+    return updatedStockProducts;
   }
 }
 

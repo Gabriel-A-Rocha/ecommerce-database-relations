@@ -87,6 +87,15 @@ class CreateOrderService {
     console.log('order');
     console.log(order);
 
+    const updateQuantityArray = formattedProducts.map(item => {
+      return {
+        id: item.product_id,
+        quantity: item.quantity,
+      };
+    });
+
+    this.productsRepository.updateQuantity(updateQuantityArray);
+
     return order;
   }
 }
