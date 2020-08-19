@@ -4,6 +4,8 @@ import AppError from '@shared/errors/AppError';
 
 import IProductsRepository from '@modules/products/repositories/IProductsRepository';
 import ICustomersRepository from '@modules/customers/repositories/ICustomersRepository';
+import ProductsRepository from '@modules/products/infra/typeorm/repositories/ProductsRepository';
+import { response } from 'express';
 import Order from '../infra/typeorm/entities/Order';
 import IOrdersRepository from '../repositories/IOrdersRepository';
 
@@ -38,16 +40,54 @@ class CreateOrderService {
       throw new AppError('This customer ID does not exist.', 400);
     }
 
-    /*    interface IProduct {
-      product_id: string;
-      price: number;
-      quantity: number;
-    } */
+    const stockProducts = await this.productsRepository.findAllById(
+      products.map(item => {
+        return {
+          id: item.id,
+        };
+      }),
+    );
 
-    const order = this.ordersRepository.create({
-      customer,
-      products,
+    console.log('stockProducts');
+    console.log(stockProducts);
+
+    if (stockProducts.length !== products.length) {
+      throw new AppError('Incorrect product ID provided.', 400);
+    }
+
+    // add current price to the requested products
+    const formattedProducts = products.map(item => {
+      const stockProduct = stockProducts.find(
+        product => product.id === item.id,
+      );
+
+      if (!stockProduct) {
+        throw new AppError('Error during product search.', 400);
+      }
+
+      if (item.quantity > stockProduct.quantity) {
+        throw new AppError('There is not enough stock available.', 400);
+      }
+
+      return {
+        product_id: item.id,
+        quantity: item.quantity,
+        price: stockProduct.price,
+      };
     });
+
+    console.log('formattedProducts');
+    console.log(formattedProducts);
+
+    const order = await this.ordersRepository.create({
+      customer,
+      products: formattedProducts,
+    });
+
+    console.log('order');
+    console.log(order);
+
+    return order;
   }
 }
 
