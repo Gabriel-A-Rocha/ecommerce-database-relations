@@ -48,9 +48,6 @@ class CreateOrderService {
       }),
     );
 
-    console.log('stockProducts');
-    console.log(stockProducts);
-
     if (stockProducts.length !== products.length) {
       throw new AppError('Incorrect product ID provided.', 400);
     }
@@ -76,16 +73,10 @@ class CreateOrderService {
       };
     });
 
-    console.log('formattedProducts');
-    console.log(formattedProducts);
-
     const order = await this.ordersRepository.create({
       customer,
       products: formattedProducts,
     });
-
-    console.log('order');
-    console.log(order);
 
     const updateQuantityArray = formattedProducts.map(item => {
       return {
@@ -94,7 +85,7 @@ class CreateOrderService {
       };
     });
 
-    this.productsRepository.updateQuantity(updateQuantityArray);
+    await this.productsRepository.updateQuantity(updateQuantityArray);
 
     return order;
   }

@@ -54,6 +54,8 @@ class ProductsRepository implements IProductsRepository {
 
     const stockProducts = await this.ormRepository.findByIds(idsToUpdate);
 
+    console.log(stockProducts);
+
     if (!stockProducts) {
       throw new AppError('Error during stock quantity update.');
     }
@@ -72,6 +74,10 @@ class ProductsRepository implements IProductsRepository {
         quantity: stockProduct.quantity - productFromRequest.quantity,
       };
     });
+
+    console.log(updatedStockProducts);
+
+    await this.ormRepository.save(updatedStockProducts);
 
     return updatedStockProducts;
   }
